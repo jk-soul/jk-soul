@@ -22,3 +22,37 @@ jk-soul
 这是一个引用型链接 [示例][id]。
 这是一个引用型链接 [示例] [id]。
 [id]: http://example.com/  "Optional Title Here"
+
+问1
+ var arr = function () {
+        var s = "text";
+        var S = new String(s);
+        S.len = 3;
+    }
+    console.log(S.len);
+    };
+    arr();
+    
+问2
+    var arr = function () {
+        var a = [1, 2, 3];
+        var b = [];
+        for (var i = 0, i < a.length, i++ )
+        {
+            b[i] = a[i];
+        }
+    }
+    console.log(a===b);
+    }
+    ;
+    arr();
+    
+ 全局变量
+  sc=11
+    var arr=function(){
+        sc=12;
+        sg=13;
+        return[sc,sg]
+       }
+    arr()
+    console.log(sg);
