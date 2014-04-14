@@ -24,6 +24,7 @@ jk-soul
 [id]: http://example.com/  "Optional Title Here"
 
 问1
+```javascript
  var arr = function () {
         var s = "text";
         var S = new String(s);
@@ -32,8 +33,9 @@ jk-soul
     console.log(S.len);
     };
     arr();
-    
+```    
 问2
+```javascript
     var arr = function () {
         var a = [1, 2, 3];
         var b = [];
@@ -48,6 +50,8 @@ jk-soul
     arr();
     
  全局变量
+ 1、
+----
   sc=11
     var arr=function(){
         sc=12;
@@ -56,3 +60,143 @@ jk-soul
        }
     arr()
     console.log(sg);
+ 
+ 2、
+----
+ sc=11
+    var arr=function(){
+       var sc=12;
+       var ari = function(){
+        var sc=13;
+           return sc;
+       }
+        console.log(ari());
+        return sc
+       }
+       console.log(arr());
+    console.log(sc);
+    
+    
+ 作用域、
+  sc=11
+    var arr=function(){
+      console.log(sc)
+        var ari =function(){
+            var sc =12;
+            console.log(sc);
+        }
+        ari();
+        }
+     arr();
+     
+     
+赋值运算    
+    var i = 0;
+    var data = [];
+    data[0]=1;
+    console.log(data);
+    console.log(data[i++]);
+    console.log(i);
+    data[i++] *= 2;
+    console.log(data);
+    
+    
+    data[i++]= data[i++] * 2;
+    
+    
+   var geval=eval;
+var x= "gift",y="gift"
+    function f(){
+    var x ="tt";
+eval("x+='change';");
+        return x;
+    }
+ function g(){
+     var y="tt";
+     eval("y+='change';");
+     return y;
+ }
+    console.log(f(),x);
+    console.log(g(),y);  
+
+问3 
+    function arr(x){
+        x>0?x:-x ;
+        return x;
+        console.log(x);
+    }
+arr(5);
+
+
+问4
+   value=1
+    var arr =function (){
+        (typeof value == "string"?"'"+value+"'":value)
+    }
+arr();
+
+问5
+    var n;
+    var arr = function (n) {
+        switch (n) {
+            case 1:
+                return 2;
+                break;
+            case 2:
+                return 4;
+                break;
+            case 3:
+                return 6;
+                break;
+            default:
+                return'hah';
+                break;
+        }
+        ;
+    };
+        console.log(arr(8),n)  //n为为定义
+        
+        
+        
+        
+switch
+------
+   var n;
+    var bian = function (n) {
+        switch (typeof n) {
+            case 'number':
+                return n.toString(16)
+                break;
+            case 'string':
+                return '"' + n + '"'
+                break;
+            default :
+                return String(n)
+        }
+    }
+    console.log(bian(17))
+    
+do/while
+--------
+  var a=[1,2,3]
+ function find(){
+     var len= a.length,i=0
+     if(len==0){
+         console.log('kongde')
+     }
+     else{
+         do {console.log(a[i])
+         }while(++i<len)
+     }
+ }
+    find()
+    
+    
+FOR
+----
+   var o={next: 'nihao'};
+    function ati(o) {
+        for (; o.next; o = o.next)/*empty*/;
+        console.log(o)
+    }
+ ati(o)
