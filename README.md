@@ -155,10 +155,10 @@ arr();
         ;
     };
         console.log(arr(8),n)  //n为为定义
+```        
         
         
-        
-        
+```javascript        
 switch
 ------
    var n;
@@ -200,7 +200,10 @@ FOR
         console.log(o)
     }
  ati(o)
- 
+``` 
+
+
+ ```javascript
  关联数组
  --------
    var avi={p1:1,p2:2,p3:3}
@@ -211,7 +214,8 @@ var arr=function(){
     console.log(add)
 }
     arr()
-    
+```
+
  索引
 --------
 var a=[1,2,3]
@@ -231,8 +235,8 @@ var a=[1,2,3]
     }
     ;
     arr(a,b);
-    
-    
+```    
+```javascript   
 实例
 ----
   var defaultSetting = {'china': 1, 'jiangsu': 1, 'suzhou': 1,'pingjiang':1,'xiandaihuanyuan':71};
@@ -247,3 +251,74 @@ var a=[1,2,3]
     }
     ;
     arr(defaultSetting, userSetting);
+``` 
+    
+```javascript 
+Inherit
+-------
+var p={x:1}
+    function inherit(p) {
+        if (p == null)throw new TypeError();
+        if (Object.create)
+            return Object.create(p);
+        var t = typeof p;
+        if (t !== 'Object' && t !== 'function')throw   new TypeError();
+        function f() {
+        };
+        f.prototype = p;
+        return new f();
+    }
+    console.log(inherit(p));
+```
+
+```javascript
+
+ function cls(a){
+      if(a==null)return 'null';
+      if(a==undefined)return'undefined';
+      return Object.prototype.toString.call(a).slice(8,-1)
+  }
+    console.log(cls(a))
+    
+序列化对象
+----------
+```javascript
+var a={};
+ var arr= function(){
+    o={x:1,y:{z:[false,null,'']}};
+     s=JSON.stringify(o);
+     console.log(s);
+     p=JSON.parse(s);
+     console.log(s);
+};
+    arr()
+```
+
+问2
+----
+```javascript
+var a=['heh']
+    var value= a[0]
+    a[1]=3.14
+    i=2
+    a[i]=3
+    a[i+1]='hello'
+    a[a[i]]=a[0]
+    console.log(a)
+```
+
+Sort
+----
+```javascript
+   var a = [1111, 222, 33, 4];
+    a.sort();
+    console.log(a);
+    a.sort(function (a, b) {
+        return a - b;
+    });
+    console.log(a);
+    a.sort(function (a, b) {
+        return b - a
+    });
+    console.log(a);
+```
