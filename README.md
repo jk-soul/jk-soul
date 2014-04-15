@@ -200,3 +200,50 @@ FOR
         console.log(o)
     }
  ati(o)
+ 
+ 关联数组
+ --------
+   var avi={p1:1,p2:2,p3:3}
+var arr=function(){
+    var add=""
+    for(var i= 1;i<4;i++){
+    add+=avi["p"+i]+'\n';}
+    console.log(add)
+}
+    arr()
+    
+ 索引
+--------
+var a=[1,2,3]
+ for(p in a)
+    console.log(p)
+    
+问1
+----
+   var a = {x: 1, y: 2, z: 3}
+    var b = {x: 2};
+    function arr(a,b) {
+        for (p in a) {
+            if (b.hasOwnProperty[p])continue;
+            b[p] = a[p];
+        }
+        console.log(b)
+    }
+    ;
+    arr(a,b);
+    
+    
+实例
+----
+  var defaultSetting = {'china': 1, 'jiangsu': 1, 'suzhou': 1,'pingjiang':1,'xiandaihuanyuan':71};
+    var userSetting = {'xiandaihuayuan':72};
+    function arr(defaultSetting, userSetting) {
+        for (key in defaultSetting) {
+            console.log(key);
+            if (userSetting[key])continue;
+            userSetting[key] = defaultSetting[key];
+        }
+        console.log(userSetting)
+    }
+    ;
+    arr(defaultSetting, userSetting);
