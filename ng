@@ -1,0 +1,12 @@
+NG
+===
+控制器
+------
+<body ng-app>
+<script src="../bower_components/angular/angular.min.js"></script>
+<script src="./heh.js" ></script>
+<div ng-controller="testCtrl">
+    {{user.x}}
+</div>
+</body>
+
