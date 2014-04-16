@@ -46,7 +46,7 @@ jk-soul
     }
     console.log(a===b);
     }
-    ;
+    ；
     arr();
     
  全局变量
@@ -322,3 +322,39 @@ Sort
     });
     console.log(a);
 ```
+
+
+    
+```javascript
+对象属性做实参
+-------------
+function arrycopy(/*array*/from,/*index*/from_start,/*arry*/to,/*index*/to_start,/*integer*/length){
+        var a= 0;
+        console.log(from,from_start,to,to_start,length);
+               console.log(a=from+from_start+to+to_start+length);
+    }
+  function easycopy(args){
+    arrycopy(args.from,
+            args.from_start||0,
+            args.to,
+            args.to_start||0,args.length);
+  }
+    var a=[1,2,3,4],b=[];
+    easycopy({from:a,to:b,length:4});
+```
+
+```javascript
+自定义函数属性
+--------------
+  function fac(n) {
+        if (isFinite(n) && n > 0 && n == Math.round(n)) {
+            if (!(n in fac))
+                fac[n] = n * fac(n - 1);
+            return fac[n];
+        }
+        else return  NaN;
+    }
+    fac[1] = 1;
+    console.log(fac(5))
+```
+
