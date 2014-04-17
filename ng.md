@@ -368,3 +368,24 @@ x.v as x.name group by x.g for x in o
     }
 </script>
 ```
+
+select+ng-repeat
+-----------------
+```html
+<script src="./angular/angular.min.js"></script>
+<body ng-app ng-controller="TestCtrl">
+<select ng-model="user" ng-options="user.id as user.name  group by user.age for user in arr">
+</select>
+<div ng-repeat="user in arr">{{  user.name  }}</div>
+</body>
+</html>
+<script>
+    var TestCtrl = function ($scope) {
+        $scope.arr = [
+            {name: 'a', id: 1, age: 21},
+            {name: 'b', id: 2, age: 21},
+            {name: 'c', id: 3, age: 22}
+        ]
+    }
+</script>
+```
