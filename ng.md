@@ -389,3 +389,64 @@ select+ng-repeat
     }
 </script>
 ```
+
+排序 order
+---------- 
+```html
+<body>
+<div ng-controller="TestCtrl">
+    {{arr| orderBy:'age'}}<br/>
+    {{arr| orderBy:'-age'}}<br/>
+    {{arr| orderBy:'-age' |limitTo:3}}<br/>
+    {{arr| orderBy:['age','name']}}<br/>
+</div>
+</body>
+</html>
+<script>
+    var TestCtrl = function ($scope) {
+        $scope.arr = [
+            {name: 'A', age: 3},
+            {name: 'B', age: 4},
+            {name: 'C', age: 1},
+            {name: 'D', age: 4}
+        ];
+    }
+</script>
+```
+
+HTTP请求
+--------
+```html
+<body ng-controller="PhoneListCtrl">
+Search: <input ng-model="query">
+Sort by:
+<select ng-model="orderProp ">
+    <option value="name">Alphabetical</option>
+    <option value="age">Newest</option>
+</select>
+<ul class="phones">
+    <li ng-repeat="phone in phones | filter:query | orderBy:orderProp">
+        {{phone.name}}
+        <p>{{phone.snippet}}{{phone.age}}</p>
+    </li>
+</ul>
+</body>
+</html>
+<script>
+    function PhoneListCtrl($scope, $http, $timeout) {
+        $scope.phones = [
+            {
+                "age": 1,
+                "id": "11",
+                "name": "a1",
+                "snippet": "Are you ready for everything life throws your way?"
+            }
+        ];
+        $http.get('./phones.json').success(function (res) {
+            $timeout(function () {
+                $scope.phones = res;
+            }, 1000 * 15);
+        }).error(function (res) {
+            console.log(res);
+        });
+```        
