@@ -449,4 +449,60 @@ Sort by:
         }).error(function (res) {
             console.log(res);
         });
-```        
+```    
+
+表格数据
+--------
+```html
+<body ng-controller="TestCtrl">
+<table>
+    <tr>
+        <th ng-click="f='name'; rew=!rew">名字</th>
+        <th ng-click="f='age';  rew=!rew">年龄</th>
+    </tr>
+    <tr ng-repeat="o in dataList | orderBy :f:rew">
+        <td>{{ o.name }}</td>
+        <td>{{ o.age }}</td>
+    </tr>
+</table>
+<button ng-click="page=page-1" ng-disabled="page===1">上一页</button>
+<button ng-click="page=page+1">下一页</button>
+<input type="number" ng-model="limit"/>
+</body>
+</html>
+<script>
+    /**
+     * 1.$http请求
+     * 2.定义page，dataList
+     * 3.watch->page->array.slice(start,end)获取新的dataList
+     * 4.ng-click='page=page-1'
+     * 5.http请求回调之后，要手动赋值第一页
+     *
+     * @param $scope
+     * @param $http
+     * @constructor
+     */
+    var TestCtrl = function ($scope, $http) {
+        $scope.page = 1;
+        $scope.dataList = [];
+        $scope.limit = 3;
+        $http.get('./phones.json').success(function (res) {
+            $scope.data = res;
+
+            $scope.$watch('page', function (newVal, oldVal) {
+                console.log($scope.page);
+                $scope.dataList = $scope.data.slice(($scope.page - 1) * $scope.limit, $scope.page * $scope.limit)
+                if (newVal !== oldVal) {
+
+                }
+            });
+            $scope.$watch('limit',function(newVal,oldVal){
+                $scope.dataList = $scope.data.slice(($scope.page - 1) * $scope.limit, $scope.page * $scope.limit)
+            })
+
+        });
+    };
+//    数组push,slice
+
+</script>
+```
