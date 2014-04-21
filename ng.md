@@ -506,3 +506,56 @@ Sort by:
 
 </script>
 ```
+
+选项
+----
+```html
+<body ng-controller="TestCtrl">
+<form ng-submit="submit()" name="frm">
+    <p>Title:<input type="text" ng-model="question.title" required/></p>{{question.selections}}
+    <div ng-repeat="selection in question.selections">
+        内容： <input type="text" ng-model="selection.content"/>
+        正确： <input type="checkbox" ng-model="selection.correct"/>{{$index}}
+        <button type="button" ng-click="question.selections.splice($index,1)">删除</button>
+    </div>
+    <button type="button" ng-click="question.selections.push({content:null,correct:false})">新增</button>
+    <button type="submit">提交</button>
+</form>
+
+</body>
+</html>
+<script>
+
+//表单的input $error ng-show
+    /**
+     * 1.所有的表单控件（input、select、textarea）都要在表单里面（form）
+     * 2.表单中的button需要显示的指定type，若不指定就会在click触发submit事件。
+     * 3.从表单中收集数据，ng-model=question.title。
+     * 收集的数据中包含数组，即有多组input。
+     * @param $scope
+     * @constructor
+     */
+    var TestCtrl = function ($scope) {
+        $scope.question = {
+            title: null,
+            selections: [
+                {
+                    content: null,
+                    correct: false
+                }
+            ]
+        };
+        $scope.submit = function () {
+            console.log($scope.question);
+        };
+    }
+    
+    
+    
+    
+//<div ng-repeat="selection in question.selections">
+//内容: <input type="text" ng-model="selection.content" required/>
+//正确 <input type="checkbox" ng-model="selection.correct" ng-checked="selection.correct"/>
+//    <button type="button" ng-click="question.selections.slice($index,1)">删除</button>
+//</div>
+```
