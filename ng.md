@@ -511,10 +511,12 @@ Sort by:
 ----
 ```html
 <body ng-controller="TestCtrl">
-<form ng-submit="submit()" name="frm">
-    <p>Title:<input type="text" ng-model="question.title" required/></p>{{question.selections}}
+<form ng-submit="submit()" name="frm" novalidate>
+    <p>Title:<input type="text"  name='title' ng-model="question.title" required/></p>
+    <span ng-show='frm.title.$error.required'>不能为空</span>{{frm.title.$error}}
     <div ng-repeat="selection in question.selections">
-        内容： <input type="text" ng-model="selection.content"/>
+        内容： <input type="text" ng-model="selection.content" required/>
+        <span ng-show="(selection.content==null||selection.content=='')">不能为空</span>
         正确： <input type="checkbox" ng-model="selection.correct"/>{{$index}}
         <button type="button" ng-click="question.selections.splice($index,1)">删除</button>
     </div>
@@ -525,8 +527,7 @@ Sort by:
 </body>
 </html>
 <script>
-
-//表单的input $error ng-show
+    //表单的input $error ng-show
     /**
      * 1.所有的表单控件（input、select、textarea）都要在表单里面（form）
      * 2.表单中的button需要显示的指定type，若不指定就会在click触发submit事件。
@@ -548,14 +549,10 @@ Sort by:
         $scope.submit = function () {
             console.log($scope.question);
         };
+//        $scope.f=function(){
+//            if(selection.content==null) return true;
+//            return false
+//        };
     }
-    
-    
-    
-    
-//<div ng-repeat="selection in question.selections">
-//内容: <input type="text" ng-model="selection.content" required/>
-//正确 <input type="checkbox" ng-model="selection.correct" ng-checked="selection.correct"/>
-//    <button type="button" ng-click="question.selections.slice($index,1)">删除</button>
-//</div>
+</script>
 ```
