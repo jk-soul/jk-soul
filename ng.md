@@ -556,3 +556,25 @@ Sort by:
     }
 </script>
 ```
+ng-resource
+```javascript
+<body ng-controller="TestCtrl">s
+</body>
+</html>
+<script>
+    angular.module('demo',['ngResource'])
+            .factory('User',function($resource){
+                return $resource('/user/:userId', {userId:'@id'});
+            })
+//            .factory('User',function($resource){
+//                return $resource('http://12.12.12.91:8080/api/sys/user/:_id', {_id:'@_id'});
+//            })
+            .controller('TestCtrl',function($scope,User){
+                console.dir(User);
+                var user = User.get({userId:123,sb:'jk'}, function() {
+                    user.abc = true;
+                    user.$save();
+                });
+            })
+</script>
+```
