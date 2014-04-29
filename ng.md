@@ -577,4 +577,134 @@ ng-resource
                 });
             })
 </script>
+
+
+
+
+
+
+
+ angular.module('scm')
+        .factory('User', ['$resource', function ($resource) {
+            return $resource('/api/sys/User/:_id', {_id: '@_id'}, {
+                login: {method: 'POST', url: '/api/sys/User/:username/login', params: {username: '@username'}},
+                resetPassword: {method: 'POST', url: '/api/sys/resetPassword/user'},
+                unique: {method: 'GET', url: '/api/sys/User/unique/:field/:value'},
+                selector: {method: 'GET', url: '/api/sys/User/selector', isArray: true},
+                count: {method: 'GET', url: '/api/sys/User/count'},
+                getQuickLaunch: {method: 'GET', url: '/api/sys/User/:username/quickLaunch', params: {username: '@username'}},
+                setQuickLaunch: {method: 'POST', url: '/api/sys/User/:username/quickLaunch/:contentType', params: {username: '@username', contentType: '@contentType'}}
+            });
+        }])
+```
+
+uiRoute
+-------
+```javascript
+ $stateProvider
+                    .state('login', {
+                        url: '/login',
+                        templateUrl: 'views/login.html',
+                        controller: 'LoginCtrl'
+                    })
+                    .state('route1',{
+                        url:'/route1',
+                        templateUrl:'views/exercise.html',
+                        controller:'TestCtrl'
+                    })
+                    .state('route2',{
+                        url:'/route2',
+                        templateUrl:'views/ex2.html',
+                        controller:'exCtrl'
+                    })
+                    
+                    
+<form name="frm" ng-submit="submit()">
+<div>用户名: <input type="text"  name="name" ng-model="user.username"/></div>
+<div>密码 :<input type="text"  name="password" ng-model="user.password"/></div>
+<button type="submit()">登陆</button>
+</form>                    
+```                    
+登陆
+-----
+```javascript
+(function () {
+    "use strict";
+    angular.module('scm')
+        .controller('TestCtrl', ['$scope', '$http', '$state', 'md5', 'User',
+            function ($scope, $http, $state, md5, User) {
+                $scope.user = {
+                    username: 'jk',
+                    password: md5.createHash('harttech')
+                };
+                $scope.submit = function () {
+                    User.login($scope.user).$promise
+                        .then(function (res) {
+                            window.localStorage.setItem('token', res.token);
+                             window.localStorage.setItem('expires', new Date().valueOf() + res.expires);
+                            window.localStorage.setItem('strategy', res.strategy);
+                            window.localStorage.setItem('username', res.username);
+                            $http.defaults.headers.common.Authorization = window.localStorage.strategy + ' ' + window.localStorage.token;
+                            $state.go('route2');
+                        })
+                        .then(null, function (res) {
+                            //TODO:登陆失败的处理
+                            console.log(res.data);
+                        })
+                }
+            }
+        ])
+})();
+```
+
+获取并插入数据
+--------------
+```javascript
+<button ng-click="ex()">用户列表</button>
+<div class="gridStyle" ng-grid="gridOptions">nihao</div>
+
+.gridStyle {
+    border: 1px solid rgb(212,212,212);
+    width: 400px;
+    height: 300px;
+}
+
+
+
+(function () {
+    "use strict";
+    angular.module('scm')
+        .factory('User', function ($resource) {
+            return $resource('/scm/api/sys/User')
+        })
+        .controller('exCtrl', function (User, $scope) {
+            $scope.gridOptions = { data: 'myData' };
+            User.query({
+                filter: {},
+                limit: 30,
+                age: 1,
+                sort: {lastModifiedDate: 'desc'}
+            }).$promise.then(function (res) {
+                    $scope.myData = res;
+                });
+        });
+
+//    angular.module('scm')
+//        .factory('User', function ($resource) {
+//            return $resource('/scm/api/sys/User');
+//        })
+//        .controller('exCtrl', function ($scope, User) {
+//            $scope.gridOptions = { data: 'myData' };
+//            var user = User.query({
+//                filter: {},
+//                limit: 30,
+//                age: 1,
+//                sort: {lastModifiedDate: 'desc'}
+//            }, function () {
+//                console.log(User);
+//                $scope.myData = user;
+//
+//            });
+//        });
+})();
 ```
