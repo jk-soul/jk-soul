@@ -678,7 +678,17 @@ uiRoute
             return $resource('/scm/api/sys/User')
         })
         .controller('exCtrl', function (User, $scope) {
-            $scope.gridOptions = { data: 'myData' };
+            $scope.gridOptions = { data: 'myData',
+             columnDefs: [
+                        {field:'title', displayName:'姓名'},
+                            {field:'email', displayName:'邮箱'},
+                            {field:'status', displayName:'status', cellTemplate: "<div><input type='checkbox' ng-model='row.entity.status' disabled='disabled' /></div>"},
+                            {cellTemplate:'<div><button ng-click="open()">点我</button></div>'},
+                            {field:'lastModifiedDate', displayName:'创建时间',cellFilter:'date:"yyyy-MM-dd  HH:mm:ss"'},
+                            {field:'createAt', displayName:'修改时间',cellFilter:'date:"yyyy-MM-dd  HH:mm:ss"'}
+
+                    ]
+            };
             User.query({
                 filter: {},
                 limit: 30,
