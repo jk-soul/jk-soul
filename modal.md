@@ -195,3 +195,12 @@ exercise..html
 <div>密码 :<input type="text"  name="password" ng-model="user.password"/></div>
 <button type="submit()">登陆</button>
 </form>
+
+
+gird.css
+--------
+.gridStyle {
+    border: 1px solid rgb(212,212,212);
+    width: 400px;
+    height: 300px;
+}
