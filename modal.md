@@ -186,3 +186,12 @@ ModalDemoCtrl.js
 //
 //            }])
 })();
+
+
+exercise..html
+--------------
+<form name="frm" ng-submit="submit()">
+<div>用户名: <input type="text"  name="name" ng-model="user.username"/></div>
+<div>密码 :<input type="text"  name="password" ng-model="user.password"/></div>
+<button type="submit()">登陆</button>
+</form>
