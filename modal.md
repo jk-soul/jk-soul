@@ -132,6 +132,7 @@ exCtrl.js
 })();
 
 ModalDemoCtrl.js
+----------------
 /**
  * Created by Lannister on 2014/4/30.
  */
