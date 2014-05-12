@@ -34,3 +34,37 @@ Concept
 
 工作流任务
 -------------
+
+描述
+
+/public/views/workflowTemplate放置的是各个工作流的任务表单
+/public/views/task放置的是常用的任务审批表单
+控制器的路径为/src/workflow，常用的任务的控制器写在TaskCtrl中；流程特有的任务（比如询价审批任务的从询价员收集询价信息）的控制器写在对应的文件里面
+询价计划审批流程中，需要从任务的表单中收集询价员的询价信息，完成表单和控制器
+
+
+.controller('PurchasePlanInquiryTaskCtrl', ['$scope', 'Task', '$stateParams', '$injector',
+            function ($scope, Task, $stateParams, $injector) {
+                Task.get({_id: $stateParams.taskId}).$promise
+                    .then(function (res) {
+                        $scope.task = res;
+                        if (!$scope.task.result)$scope.task.result = {};
+                        var service = $injector.get($scope.task.instance.initialItem.model);
+                        return service.get({_id: $scope.task.instance.initialItem._id}).$promise;
+                        /*                        $scope.task.result.inquiryLog = [
+                         {
+                         provider: '536afb6e99d07ae42592bb4b',
+                         contact: '小敏aaa',
+                         telephone: '小敏的电话',
+                         unit: 2222,
+                         freight: true,
+                         payWay: '货到付款',
+                         remark: '小敏的备注'
+                         }
+                         ];*/
+//                        $scope.submit();
+                    })
+                    .then(function (res) {
+                        $scope.doc = res;
+                        console.log($scope.doc);
+                    })
