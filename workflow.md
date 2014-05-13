@@ -37,10 +37,10 @@ Concept
 
 描述
 
-/public/views/workflowTemplate放置的是各个工作流的任务表单
-/public/views/task放置的是常用的任务审批表单
+* /public/views/workflowTemplate放置的是各个工作流的任务表单
+* /public/views/task放置的是常用的任务审批表单
 控制器的路径为/src/workflow，常用的任务的控制器写在TaskCtrl中；流程特有的任务（比如询价审批任务的从询价员收集询价信息）的控制器写在对应的文件里面
-询价计划审批流程中，需要从任务的表单中收集询价员的询价信息，完成表单和控制器
+* 询价计划审批流程中，需要从任务的表单中收集询价员的询价信息，完成表单和控制器
 
 ```javascript
 .controller('PurchasePlanInquiryTaskCtrl', ['$scope', 'Task', '$stateParams', '$injector',
