@@ -733,3 +733,30 @@ $scope.$watch('objOne.a+objTwo.b+...', watchCallback);
 $scope.$watch('obj',watchCallback,true)
 
 其中,obj可以是对象,也可以是数组
+
+生产计划列表
+```javascript
+ $scope.$watch('doc.product + doc.type', function () {
+                    if ($scope.doc.type === '再生产' && $scope.doc.product) {
+                        $scope.ProductionTaskSelector = ProductionTask.selector({filter: JSON.stringify({type: '再生产', product: $scope.doc.product
+                        })});
+                    }
+                    else if ($scope.doc.type === '一般生产' && $scope.doc.product) {
+                        $scope.ProductionTaskSelector = ProductionTask.selector({filter: JSON.stringify({type: {$in: ['销售生产', '不合格品补产', '样品生产']}, product: $scope.doc.product
+                        })});
+                    }
+                });
+                $scope.$watch('doc.info', function () {
+                    for (var i = 0, len = $scope.doc.info.length; i < len; i++) {
+                        if (_.find($scope.ProductionTaskSelector, {_id: $scope.doc.info[i].task})) {
+                            $scope.doc.deliveryDate = _.find($scope.ProductionTaskSelector, {_id: $scope.doc.info[i].task}).deliveryDate;
+                        break;
+                        }
+                    }
+                    for (var j = 0, leng = $scope.doc.info.length; j < leng; j++) {
+                            if (_.find($scope.ProductionTaskSelector, {_id: $scope.doc.info[j].task}) && Date.compare(new Date($scope.doc.deliveryDate), new Date(_.find($scope.ProductionTaskSelector, {_id: $scope.doc.info[j].task}).deliveryDate)) > 0) {
+                                    $scope.doc.deliveryDate = _.find($scope.ProductionTaskSelector, {_id: $scope.doc.info[j].task}).deliveryDate;
+                            }
+                    }
+                }, true);
+```
