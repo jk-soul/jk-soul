@@ -760,3 +760,9 @@ $scope.$watch('obj',watchCallback,true)
                     }
                 }, true);
 ```
+
+```javascript
+{type:{$in:['销售生产', '不合格品补产', '样品生产']}}
+
+ $scope.MaterielSelector = Materiel.selector({filter: JSON.stringify({'property': {$in:['主料','色母料','其他']}})});
+```
