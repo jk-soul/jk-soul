@@ -772,4 +772,7 @@ $scope.$watch('obj',watchCallback,true)
                                 inUse: false
                             },{_id:{$in: _.pluck($scope.doc.storage,'location')}}]
                         })});
+                        
+$scope.ProductionTaskSelector = ProductionTask.selector({filter: JSON.stringify({produceType: '再生产', product: $scope.doc.product
+                                })});
 ```
