@@ -765,4 +765,11 @@ $scope.$watch('obj',watchCallback,true)
 {type:{$in:['销售生产', '不合格品补产', '样品生产']}}
 
  $scope.MaterielSelector = Materiel.selector({filter: JSON.stringify({'property': {$in:['主料','色母料','其他']}})});
+ 
+ $scope.StorageLocationSelector = StorageLocation.selector({filter: JSON.stringify({
+                            $or:[{
+                                status: '正常',
+                                inUse: false
+                            },{_id:{$in: _.pluck($scope.doc.storage,'location')}}]
+                        })});
 ```
