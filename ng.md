@@ -776,3 +776,43 @@ $scope.$watch('obj',watchCallback,true)
 $scope.ProductionTaskSelector = ProductionTask.selector({filter: JSON.stringify({produceType: '再生产', product: $scope.doc.product
                                 })});
 ```
+
+```javascript
+ var a = [
+                    {
+                        batch: {
+                            line: 1
+                        },
+                        quantity: {
+                            produce: 0,
+                            withdrawal: 1
+                        }
+                    },
+                    {
+                        batch: {
+                            line: 2
+                        },
+                        quantity: {
+                            produce: 0,
+                            withdrawal: 1
+                        }
+                    },
+                    {
+                        batch: {
+                            line: 1
+                        },
+                        quantity: {
+                            produce: 0,
+                            withdrawal: 1
+                        }
+                    }
+                ];
+                var obj = {};
+                _.forEach(a, function (item) {
+                    if (obj[item.batch.line]) {
+                        obj[item.batch.line].push(item);
+                    } else {
+                        obj[item.batch.line] = [];
+                    }
+                });
+```
