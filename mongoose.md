@@ -121,4 +121,23 @@ var animalSchema = new Schema({
 
 animalSchema.index({ name: 1, type: -1 }); // schema level
 ```
+虚函数
+------
+虚函数的文档属性，可以获取和设置但没有得到持续到MongoDB的。
+```javascript
+// define a schema
+var personSchema = new Schema({
+  name: {
+    first: String,
+    last: String
+  }
+});
 
+// compile our model
+var Person = mongoose.model('Person', personSchema);
+
+// create a document
+var bad = new Person({
+    name: { first: 'Walter', last: 'White' }
+});
+```
