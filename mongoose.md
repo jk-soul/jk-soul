@@ -205,6 +205,7 @@ autoIndex
 - versionKey
 
 选项：autoIndex
+-------------------
 在应用程序启动时，mongoose在你的Schema中都每个索引都发送了ensureIndex命令，由于是mongoosV3，索引是在后台默认情况下创建的，如果你想禁用自动创建功能和手动创建索引时处理，你的架构自动索引选项设置为false，并使用你的模型ensureIndexes方法。
 ```javascript
 var schema = new Schema({..}, { autoIndex: false });
@@ -212,12 +213,98 @@ var Clock = mongoose.model('Clock', schema);
 Clock.ensureIndexes(callback);
 ```
 选项：bufferCommands
+--------------------
 When running with the drivers autoReconnect option disabled and connected to a single mongod (non-replica-set), mongoose buffers commands when the connection goes down until you manually reconnect. To disable mongoose buffering under these conditions, set this option to false.
 ```javascript
 var schema = new Schema({..}, { bufferCommands: false });
 ```
 选项：capped
+-------------
 mongoose支持mongoDB的封顶集合，要指定相关的MongoDB集合封顶，设置上限选项，集合的最大尺寸为以字节为单位。
 ```javascript
 new Schema({..}, { capped: 1024 });
+```
+限制选项也可以被设置为一个对象，如果你想传输附加选项，比如max 或 autoIndexId.
+```javascript
+var dataSchema = new Schema({..}, { collection: 'data' });
+```
+选项：id
+----------
+mongoose通过在默认情况下同过返回文档的_id给每个模型分配一个id，
+```javascript
+// default behavior
+var schema = new Schema({ name: String });
+var Page = mongoose.model('Page', schema);
+var p = new Page({ name: 'mongodb.org' });
+console.log(p.id); // '50341373e894ad16347efe01'
+
+// disabled id
+var schema = new Schema({ name: String }, { id: false });
+var Page = mongoose.model('Page', schema);
+var p = new Page({ name: 'mongodb.org' });
+console.log(p.id); // undefined
+```
+选项：_id
+------------
+```javascript
+// default behavior
+var schema = new Schema({ name: String });
+var Page = mongoose.model('Page', schema);
+var p = new Page({ name: 'mongodb.org' });
+console.log(p); // { _id: '50341373e894ad16347efe01', name: 'mongodb.org' }
+
+// disabled _id
+var schema = new Schema({ name: String }, { _id: false });
+
+// Don't set _id to false after schema construction as in
+// var schema = new Schema({ name: String });
+// schema.set('_id', false);
+
+var Page = mongoose.model('Page', schema);
+var p = new Page({ name: 'mongodb.org' });
+console.log(p); // { name: 'mongodb.org' }
+
+// MongoDB will create the _id when inserted
+p.save(function (err) {
+  if (err) return handleError(err);
+  Page.findById(p, function (err, doc) {
+    if (err) return handleError(err);
+    console.log(doc); // { name: 'mongodb.org', _id: '50341373e894ad16347efe12' }
+  })
+})
+```
+选项：read
+-----------
+允许在模式的级别设置查询#读取选项，提供给我们一种方法，对所有来自同一个模型的查询提供了默认的 ReadPreferences。
+```javascript
+var schema = new Schema({..}, { read: 'primary' });            // also aliased as 'p'
+var schema = new Schema({..}, { read: 'primaryPreferred' });   // aliased as 'pp'
+var schema = new Schema({..}, { read: 'secondary' });          // aliased as 's'
+var schema = new Schema({..}, { read: 'secondaryPreferred' }); // aliased as 'sp'
+var schema = new Schema({..}, { read: 'nearest' });            // aliased as 'n'
+```
+```javascript
+// pings the replset members periodically to track network latency
+var options = { replset: { strategy: 'ping' }};
+mongoose.connect(uri, options);
+
+var schema = new Schema({..}, { read: ['nearest', { disk: 'ssd' }] });
+mongoose.model('JellyBean', schema);
+```
+选项：safe
+-------------
+这个选项是向mongo传递所有指令操作的，如果出错就会调用回调函数。
+```javascript
+var safe = true;
+new Schema({ .. }, { safe: safe });
+```
+```javascript
+var safe = { w: "majority", wtimeout: 10000 };
+new Schema({ .. }, { safe: safe });
+```
+选项：shardKey
+--------------
+shardKey选项是在我们有分片MongoDB架构使用的，每个分片集合给出一个分片键，其必须出现在所有的插入/更新操作。我们只需要设置该模式选择相同的分片键,and we’ll be all set.
+```javascript
+new Schema({ .. }, { shardKey: { tag: 1, name: 1 }})
 ```
