@@ -308,3 +308,92 @@ shardKey选项是在我们有分片MongoDB架构使用的，每个分片集合�
 ```javascript
 new Schema({ .. }, { shardKey: { tag: 1, name: 1 }})
 ```
+选项：strict
+------------
+strict选项（默认启用）确保值被传递到到模型中，同过构造函数不符合schema的将不会被保持到数据库中。
+```javascript
+var thingSchema = new Schema({..})
+var Thing = mongoose.model('Thing', thingSchema);
+var thing = new Thing({ iAmNotInTheSchema: true });
+thing.save(); // iAmNotInTheSchema is not saved to the db
+
+// set to false..
+var thingSchema = new Schema({..}, { strict: false });
+var thing = new Thing({ iAmNotInTheSchema: true });
+thing.save(); // iAmNotInTheSchema is now saved to the db!!
+```
+这也影响doc.set()设置一个属性值的使用。
+```javascript
+var thingSchema = new Schema({..})
+var Thing = mongoose.model('Thing', thingSchema);
+var thing = new Thing;
+thing.set('iAmNotInTheSchema', true);
+thing.save(); // iAmNotInTheSchema is not saved to the db
+```
+这个值可以通过另一个布尔参数覆盖在模型实例级别:
+```javascript
+var Thing = mongoose.model('Thing');
+var thing = new Thing(doc, true);  // enables strict mode
+var thing = new Thing(doc, false); // disables strict mode
+```
+注意:不要设置为false,除非你有充分的理由。
+注意：在mongoose V2中默认值是false。
+注意：任何 不存在于你的模式的key/val 设置的实例总是被忽视，无论模式选项。
+```javascript
+var thingSchema = new Schema({..})
+var Thing = mongoose.model('Thing', thingSchema);
+var thing = new Thing;
+thing.iAmNotInTheSchema = true;
+thing.save(); // iAmNotInTheSchema is never saved to the db
+```
+选项：toJSON
+------------
+和 toObject 选项一样，文档调用oJSON方法。
+```javascript
+var schema = new Schema({ name: String });
+schema.path('name').get(function (v) {
+  return v + ' is my name';
+});
+schema.set('toJSON', { getters: true, virtuals: false });
+var M = mongoose.model('Person', schema);
+var m = new M({ name: 'Max Headroom' });
+console.log(m.toObject()); // { _id: 504e0cd7dd992d9be2f20b6f, name: 'Max Headroom' }
+console.log(m.toJSON()); // { _id: 504e0cd7dd992d9be2f20b6f, name: 'Max Headroom is my name' }
+// since we know toJSON is called whenever a js object is stringified:
+console.log(JSON.stringify(m)); // { "_id": "504e0cd7dd992d9be2f20b6f", "name": "Max Headroom is my name" }
+```
+选项：toObject
+--------------
+文档有一个toObject方法将mongoose文档转换成一个普通的javascript对象。该方法接受几个选项。而不是per-document基础上应用这些选项我们可以宣布这里的选项,它适用于所有默认的模式文档。、
+```javascript
+var schema = new Schema({ name: String });
+schema.path('name').get(function (v) {
+  return v + ' is my name';
+});
+schema.set('toObject', { getters: true });
+var M = mongoose.model('Person', schema);
+var m = new M({ name: 'Max Headroom' });
+console.log(m); // { _id: 504e0cd7dd992d9be2f20b6f, name: 'Max Headroom is my name' }
+```
+选项：versionKey
+----------------
+当被mongoose创建时，versionKey就是一个属性集，这个键值包含了内部文档的修订。本文档属性的名称是可配置的。缺省值是__v。如果与您的应用程序冲突，可以配置是这样的:
+```javascript
+var schema = new Schema({ name: 'string' });
+var Thing = mongoose.model('Thing', schema);
+var thing = new Thing({ name: 'mongoose v3' });
+thing.save(); // { __v: 0, name: 'mongoose v3' }
+
+// customized versionKey
+new Schema({..}, { versionKey: '_somethingElse' })
+var Thing = mongoose.model('Thing', schema);
+var thing = new Thing({ name: 'mongoose v3' });
+thing.save(); // { _somethingElse: 0, name: 'mongoose v3' }
+```
+文档版本也可以通过设置禁用versionKey为false来控制，不要禁用版本,除非你知道你正在做什么。
+```javascript
+new Schema({..}, { versionKey: false });
+var Thing = mongoose.model('Thing', schema);
+var thing = new Thing({ name: 'no versioning please' });
+thing.save(); // { name: 'no versioning please' }
+```
