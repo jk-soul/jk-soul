@@ -397,3 +397,119 @@ var Thing = mongoose.model('Thing', schema);
 var thing = new Thing({ name: 'no versioning please' });
 thing.save(); // { name: 'no versioning please' }
 ```
+SchemaTypes
+============
+SchemaTypes处理路径的定义默认值,验证、getter、setter,查询的默认字段，查看各自的API文档的更多细节。
+以下是所有有效的模式类型：
+- String
+- Number
+- Date
+- Buffer
+- Boolean
+- Mixed
+- Objectid
+- Array
+```javascript
+var schema = new Schema({
+  name:    String,
+  binary:  Buffer,
+  living:  Boolean,
+  updated: { type: Date, default: Date.now }
+  age:     { type: Number, min: 18, max: 65 }
+  mixed:   Schema.Types.Mixed,
+  _someId: Schema.Types.ObjectId,
+  array:      [],
+  ofString:   [String],
+  ofNumber:   [Number],
+  ofDates:    [Date],
+  ofBuffer:   [Buffer],
+  ofBoolean:  [Boolean],
+  ofMixed:    [Schema.Types.Mixed],
+  ofObjectId: [Schema.Types.ObjectId],
+  nested: {
+    stuff: { type: String, lowercase: true, trim: true }
+  }
+})
+```
+// example use
+
+var Thing = mongoose.model('Thing', schema);
+
+var m = new Thing;
+m.name = 'Statue of Liberty'
+m.age = 125;
+m.updated = new Date;
+m.binary = new Buffer(0);
+m.living = false;
+m.mixed = {[ any: { thing: 'i want' } ]};
+m.markModified('mixed');
+m._someId = new mongoose.Types.ObjectId;
+m.array.push(1);
+m.ofString.push("strings!");
+m.ofNumber.unshift(1,2,3,4);
+m.ofDate.addToSet(new Date);
+m.ofBuffer.pop();
+m.ofMixed = [1, [], 'three', { four: 5 }];
+m.nested.stuff = 'good';
+m.save(callback);
+
+使用注意事项:
+
+Dates
+-----
+内置方法即不连接到mongoose日期便能更改跟踪逻辑，这意味着你在文档中使用日期，其修改方法就类似于setMonth(),mongoose不会意识到这种变化,doc.save()不会持续这一修改。如果你必须修改日期类型使用内置的方法,在保存之前告诉mongoose改变doc.markModified(“pathToYourDate”)。
+```javascript
+var Assignment = mongoose.model('Assignment', { dueDate: Date });
+Assignment.findOne(function (err, doc) {
+  doc.dueDate.setMonth(3);
+  doc.save(callback) // THIS DOES NOT SAVE YOUR CHANGE
+  
+  doc.markModified('dueDate');
+  doc.save(callback) // works
+})
+```
+Mixed
+-----
+一个怎样都行的SchemaType，他的灵活性来自于权衡更难维护，可以通过Schema.Types混合，文字混合或通过一个空对象。以下是等价的:
+```javascript
+var Any = new Schema({ any: {} });
+var Any = new Schema({ any: Schema.Types.Mixed });
+```
+因为它是一种非模式化,你可以改变任何你喜欢的值，但是mongoose没有自动保存这些更改的能力，告诉mongoose，一个MIXd的值发生了改变，调用.markModified(路径)方法文档的传递你刚刚改变了的混合型的路径。
+```javascript
+person.anything = { x: [3, 4, { y: "changed" }] };
+person.markModified('anything');
+person.save(); // anything will now get saved
+```
+ObjectIds
+---------
+指定一个类型的ObjectId,,,在你的声明中使用Schema.Types.ObjectId。
+```javascript
+var mongoose = require('mongoose');
+var ObjectId = mongoose.Schema.Types.ObjectId;
+var Car = new Schema({ driver: ObjectId })
+// or just Schema.ObjectId for backwards compatibility with v2
+```
+Arrays
+------
+提供创建SchemaTypes或Sub-Documents的数字.
+```javascript
+var ToySchema = new Schema({ name: String });
+var ToyBox = new Schema({
+  toys: [ToySchema],
+  buffers: [Buffer],
+  string:  [String],
+  numbers: [Number]
+  // ... etc
+});
+```
+注:指定一个空数组相当于MIXd。以下所有创建数组的混合:
+```javascript
+var Empty1 = new Schema({ any: [] });
+var Empty2 = new Schema({ any: Array });
+var Empty3 = new Schema({ any: [Schema.Types.Mixed] });
+var Empty4 = new Schema({ any: [{}] });
+```
+Creating Custom Types
+---------------------
+mongoose也可以通过自定义SchemaTypes扩展,搜索插件网站兼容的类型如mongoose-long和其他类型.
