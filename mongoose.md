@@ -513,3 +513,79 @@ var Empty4 = new Schema({ any: [{}] });
 Creating Custom Types
 ---------------------
 mongoose也可以通过自定义SchemaTypes扩展,搜索插件网站兼容的类型如mongoose-long和其他类型.
+
+model
+-------
+model是从我们定义的schema中构造函数,这些文档的实例表示可以从数据库中保存与retreived。数据库中所有文档的创建和retreival是通过这些模型。编译您的第一个模型
+-------------------
+```javascript
+var schema = new mongoose.Schema({ name: 'string', size: 'string' });
+var Tank = mongoose.model('Tank', schema);
+```
+构建文件
+---------
+文档是我们的模型的实例。创建并保存到数据库中是很容易的
+```javascript
+var Tank = mongoose.model('Tank', yourSchema);
+
+var small = new Tank({ size: 'small' });
+small.save(function (err) {
+  if (err) return handleError(err);
+  // saved!
+})
+
+// or
+
+Tank.create({ size: 'small' }, function (err, small) {
+  if (err) return handleError(err);
+  // saved!
+})
+```
+注意：没有tanks会被创建、移动，直到模型使用被打开。在本例中我们使用mongoose.model()让我们打开默认的mongoose连接:
+```javascript
+mongoose.connect('localhost', 'gettingstarted');
+```
+Querying
+---------
+在mongoose中查找文件时很容易的，其支持的MongoDB查询语法很丰富，文档可以使用每个retreived模型发现,findById,findOne或静态方法。
+```javascript
+Tank.find({ size: 'small' }).where('createdDate').gt(oneYearAgo).exec(callback);
+```
+Removing
+--------
+模型有一个静态去除方法用于删除所有文档匹配条件。
+```javascript
+Tank.remove({ size: 'large' }, function (err) {
+  if (err) return handleError(err);
+  // removed!
+});
+```
+
+Retrieving
+==========
+
+Updating
+---------
+有许多方法来更新文档。我们首先来看一个使用findById的传统方法:
+```javascript
+Tank.findById(id, function (err, tank) {
+  if (err) return handleError(err);
+  
+  tank.size = 'large';
+  tank.save(function (err) {
+    if (err) return handleError(err);
+    res.send(tank);
+  });
+});
+```
+这方法是首先从Mongo中retreiving文档,然后发出一个更新命令(通过调用触发保存)。然而,如果在我们的应用程序中我们不需要返回的文档,仅仅是想直接更新数据库中属性,, Model#update对我们来说是正确的:
+```javascript
+Tank.update({ _id: id }, { $set: { size: 'large' }}, callback);
+```
+如果我们需要在我们的应用程序返回的文档,这里还有个更好的选择。
+```javascript
+Tank.findByIdAndUpdate(id, { $set: { size: 'large' }}, function (err, tank) {
+  if (err) return handleError(err);
+  res.send(tank);
+});
+```
