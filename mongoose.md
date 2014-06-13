@@ -589,3 +589,78 @@ Tank.findByIdAndUpdate(id, { $set: { size: 'large' }}, function (err, tank) {
   res.send(tank);
 });
 ```
+Sub Docs
+=========
+Sub-documents是一个有自己的schema的doc，并且是父类文件数组的一个元素：
+```javascript
+var childSchema = new Schema({ name: 'string' });
+
+var parentSchema = new Schema({
+  children: [childSchema]
+})
+```
+Sub-documents有所有正常文档拥有的功能，唯一的区别是,他们不是单独保存,只有当他们顶级父文档保存时才被保存。
+```javascript
+var Parent = mongoose.model('Parent', parentSchema);
+var parent = new Parent({ children: [{ name: 'Matt' }, { name: 'Sarah' }] })
+parent.children[0].name = 'Matthew';
+parent.save(callback);
+```
+如果一个错误发生在sub-documents中间件,充溢save()回调父类,因此错误处理非常简单!
+```javascript
+childSchema.pre('save', function (next) {
+  if ('invalid' == this.name) return next(new Error('#sadpanda'));
+  next();
+});
+
+var parent = new Parent({ children: [{ name: 'invalid' }] });
+parent.save(function (err) {
+  console.log(err.message) // #sadpanda
+})
+```
+Finding a sub-document
+-----------------------
+每个文档都有一个_id。DocumentArrays有特殊的id的方法查找文档_id。
+```javascript
+var doc = parent.children.id(id);
+```
+Adding sub-docs
+----------------
+MongooseArray methods such as push, unshift, addToSet, and others cast arguments to their proper types transparently:
+```javascript
+var Parent = mongoose.model('Parent');
+var parent = new Parent;
+
+// create a comment
+parent.children.push({ name: 'Liesl' });
+var subdoc = parent.children[0];
+console.log(subdoc) // { _id: '501d86090d371bab2c0341c5', name: 'Liesl' }
+subdoc.isNew; // true
+
+parent.save(function (err) {
+  if (err) return handleError(err)
+  console.log('Success!');
+});
+```
+Sub-docs也可能利用MongooseArrays的创建方法被创建而不是通过添加。
+```javascript
+var newdoc = parent.children.create({ name: 'Aaron' });
+```
+Removing docs
+=============
+每个子文档都有它自己的删除方法。
+```javascript
+var doc = parent.children.id(id).remove();
+parent.save(function (err) {
+  if (err) return handleError(err);
+  console.log('the sub-doc was removed')
+});
+```
+Alternate declaration syntax
+=============================
+在v3如果你不需要访问子文档模式实例,您也可以声明sub-docs只需传递一个对象文字:
+```javascript
+var parentSchema = new Schema({
+  children: [{ name: 'string' }]
+})
+```
