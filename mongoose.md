@@ -659,8 +659,109 @@ parent.save(function (err) {
 Alternate declaration syntax
 =============================
 在v3如果你不需要访问子文档模式实例,您也可以声明sub-docs只需传递一个对象文字:
+
 ```javascript
 var parentSchema = new Schema({
   children: [{ name: 'string' }]
 })
 ```
+Queries
+-------
+文档可以通过几个静态的模型的辅助方法被索引。任何涉及被指定查询条件的模型都可以同过两种方式被查询：
+当一个回调函数：
+- 通过时，立即将结果传个回调函数。
+- 不通过时，返回查询的实例，其提供了一个特殊的接口。
+让我们看看同过回调函数都发生了什么：
+
+```javascript
+var Person = mongoose.model('Person', yourSchema);
+
+// find each person with a last name matching 'Ghost', selecting the `name` and `occupation` fields
+Person.findOne({ 'name.last': 'Ghost' }, 'name occupation', function (err, person) {
+  if (err) return handleError(err);
+  console.log('%s %s is a %s.', person.name.first, person.name.last, person.occupation) // Space Ghost is a talk show host.
+})
+```
+这里我们看到，查询立即被停止，结果传递给我们的回调函数。在mongoose中的所有回调函数使用的模式是 callback(error, result)。如果查询执行中出现错误，错误参数将包含在一个错误文档中，结果将是null。如果查询成功，错误参数将为null，结果将为查询结果。
+让我们看看如果没有回调函数，会发生什么：
+
+```javascript
+// find each person with a last name matching 'Ghost'
+var query = Person.findOne({ 'name.last': 'Ghost' });
+
+// selecting the `name` and `occupation` fields
+query.select('name occupation');
+
+// execute the query at a later time
+query.exec(function (err, person) {
+  if (err) return handleError(err);
+  console.log('%s %s is a %s.', person.name.first, person.name.last, person.occupation) // Space Ghost is a talk show host.
+})
+```
+查询返回的实例,使我们能够建立我们的查询。继续这个例子：
+
+```javascript
+Person
+.find({ occupation: /host/ })
+.where('name.last').equals('Ghost')
+.where('age').gt(17).lt(66)
+.where('likes').in(['vaporizing', 'talking'])
+.limit(10)
+.sort('-occupation')
+.select('name occupation')
+.exec(callback);
+```
+Validation
+----------
+在我们进学习验证语法的细节之前,请记住以下规则:
+- 验证是在SchemaType中定义的
+- 验证是中间件的一部分
+- 验证是在一个文档试图保存时发什么的。
+- 验证是异步递归;当你调用模型#保存,执行子文档验证。如果出现错误,您的模型#保存的回调函数接收它。
+- 验证支持完全自定义
+
+Built in validators
+-------------------
+mongoose有几个内置的验证。
+- 所有的SchemaTypes 都有内置的验证。
+- 数字有最大和最小的验证。
+- 字符串有 enum 和math验证。
+每个上面链接验证器提供更多的信息关于如何启用它们,以及定制相关的错误消息。
+
+Validation errors
+-----------------
+```javascript
+var toySchema = new Schema({
+  color: String,
+  name: String
+});
+
+var Toy = mongoose.model('Toy', toySchema);
+
+Toy.schema.path('color').validate(function (value) {
+  return /blue|green|white|red|orange|periwinkle/i.test(value);
+}, 'Invalid color');
+
+var toy = new Toy({ color: 'grease'});
+
+toy.save(function (err) {
+  // err is our ValidationError object
+  // err.errors.color is a ValidatorError object
+  
+  console.log(err.errors.color.message) // prints 'Validator "Invalid color" failed for path color with value `grease`'
+  console.log(String(err.errors.color)) // prints 'Validator "Invalid color" failed for path color with value `grease`'
+  console.log(err.errors.color.type)  // prints "Invalid color"
+  console.log(err.errors.color.path)  // prints "color"
+  console.log(err.errors.color.value) // prints "grease"
+  console.log(err.name) // prints "ValidationError"
+  console.log(err.message) // prints "Validation failed"
+});
+```
+验证错误后,文档也会有相同的错误属性:
+
+```javascript
+toy.errors.color.message === err.errors.color.message
+```
+
+
+
