@@ -762,6 +762,73 @@ toy.save(function (err) {
 ```javascript
 toy.errors.color.message === err.errors.color.message
 ```
+Middleware
+----------
+Middleware的功能是通过控制流执行期间文档init、验证、保存和删除方法。Middleware是在文档级别被执行，而不是模型级别。有两种类型的Middleware，让我们从Pre开始。
 
+Pre
+----
+这里有两种类型的pre中间件、串行和并行。
+Serial
+------
+当每个中间件调用next时，串行中间件是一个接一个地执行。
+```javascript
+var schema = new Schema(..);
+schema.pre('save', function (next) {
+  // do stuff
+  next();
+});
+```
+Parallel
+--------
+中间件提供更细粒度的并行流控制。
+```javascript
+var schema = new Schema(..);
+schema.pre('save', true, function (next, done) {
+  // calling next kicks off the next middleware in parallel
+  next();
+  doAsync(done);
+});
+```
+Use Cases
+----------
+Middleware是很有用的雾化模型逻辑,避免嵌套的异步代码块。以下是一些想法:
+- 复杂的验证
+- 删除相关文件
+- 删除一个用户删除他所有的言论
+- 异步违约
+- 异步任务触发某种行动
+- 触发自定义事件
+- 通知
 
+Error handling
+---------------
+如果任何中间件调用下或完成一个错误实例,流程中断,误差传递给回调函数。
+```javascript
+schema.pre('save', function (next) {
+  var err = new Error('something went wrong');
+  next(err);
+});
 
+// later...
+
+myDoc.save(function (err) {
+  console.log(err.message) // something went wrong
+});
+```
+Post middleware
+---------------
+```javascript
+schema.post('init', function (doc) {
+  console.log('%s has been initialized from the db', doc._id);
+})
+schema.post('validate', function (doc) {
+  console.log('%s has been validated (but not saved yet)', doc._id);
+})
+schema.post('save', function (doc) {
+  console.log('%s has been saved', doc._id);
+})
+schema.post('remove', function (doc) {
+  console.log('%s has been removed', doc._id);
+})
+```
