@@ -900,4 +900,47 @@ schema.post('remove', function (doc) {
   console.log('%s has been removed', doc._id);
 })
 ```
+Population
+----------
+没有连接MongoDB但有时我们仍然希望在其他集引用文件合。这就可以使用Population。
+Population的是自动替换文档与文档中指定的路径(s)与其他集合(年代)的进程，我们可以填充一个文档,多个文档,普通对象,多个普通的对象,或从一个查询返回所有对象。让我们看看一些例子。
+```javascript
+var mongoose = require('mongoose')
+  , Schema = mongoose.Schema
+  
+var personSchema = Schema({
+  _id     : Number,
+  name    : String,
+  age     : Number,
+  stories : [{ type: Schema.Types.ObjectId, ref: 'Story' }]
+});
+
+var storySchema = Schema({
+  _creator : { type: Number, ref: 'Person' },
+  title    : String,
+  fans     : [{ type: Number, ref: 'Person' }]
+});
+
+var Story  = mongoose.model('Story', storySchema);
+var Person = mongoose.model('Person', personSchema);
+```
+Saving refs
+------------
+```javascript
+var aaron = new Person({ _id: 0, name: 'Aaron', age: 100 });
+
+aaron.save(function (err) {
+  if (err) return handleError(err);
+  
+  var story1 = new Story({
+    title: "Once upon a timex.",
+    _creator: aaron._id    // assign the _id from the person
+  });
+  
+  story1.save(function (err) {
+    if (err) return handleError(err);
+    // thats it!
+  });
+})
+```
 
