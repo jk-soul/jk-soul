@@ -53,18 +53,21 @@ angular-ui/ui-router
 -----
 有几种方法可以配置状态的模板。
 最简单的就是通过template配置属性，
+
 ```javascript
 $stateProvider.state('contacts', {
   template: '<h1>My Contacts</h1>'
 })
 ```
 除了写template你还可以载入链接（大部分时候使用的方法）
+
 ```javascript
 $stateProvider.state('contacts', {
   templateUrl: 'contacts.html'
 })
 ```
 templateUrl也可以成为一个返回url的函数，这需要预设一个参数stateParams，它并不是注入。
+
 ```javascript
 $stateProvider.state('contacts', {
   templateUrl: function (stateParams){
@@ -72,7 +75,9 @@ $stateProvider.state('contacts', {
   }
 })
 ```
+
 或者你也可以使用一个模板提供一个函数，其能够注入，能够访问当地，并且必须返回一个html模板。比如：
+
 ```javascript
 $stateProvider.state('contacts', {
   templateProvider: function ($timeout, $stateParams) {
@@ -82,7 +87,9 @@ $stateProvider.state('contacts', {
   }
 })
 ```
+
 如果你想你的ui-view在激活之前有一些默认的值，你可以像下面这样做。其内容会在其状态激活后立刻被替换并且用模板填充到ui-view。
+
 ```javascript
 <body>
     <ui-view>
@@ -93,8 +100,10 @@ $stateProvider.state('contacts', {
 
 控制器
 ------
+
 你可以为你的模板分配一个控制器。警告：如果模板未定义那么控制器也不存在。
 你可以这样设置你的控制器：
+
 ```javascript
 $stateProvider.state('contacts', {
   template: '<h1>{{title}}</h1>',
@@ -103,7 +112,9 @@ $stateProvider.state('contacts', {
   }
 })
 ```
+
 或者你已经有一个控制器了，你可以这样定义你的模板:
+
 ```javascript
 $stateProvider.state('contacts', {
   template: ...,
