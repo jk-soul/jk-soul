@@ -75,7 +75,9 @@ $stateProvider.state('contacts', {
   }
 })
 ```
+
 或者你也可以使用一个模板提供一个函数，其能够注入，能够访问当地，并且必须返回一个html模板。比如：
+
 ```javascript
 $stateProvider.state('contacts', {
   templateProvider: function ($timeout, $stateParams) {
@@ -85,6 +87,7 @@ $stateProvider.state('contacts', {
   }
 })
 ```
+
 如果你想你的ui-view在激活之前有一些默认的值，你可以像下面这样做。其内容会在其状态激活后立刻被替换并且用模板填充到ui-view。
 
 ```javascript
