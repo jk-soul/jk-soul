@@ -300,11 +300,88 @@ common/models/model.json
 ```
 总的来说，你可以用这种方法扩展任意模型，不仅仅是内置的模型。
 
+你可以从一个基本的定义模型中扩展成自定义模型。例如，要从一个你已经定义的mMyBaseModel的模型中定义一个叫做MyModel 的自定义模型，，需要通过slc loopback:model 创建MyModel，然后编辑common/models/MyModel.json如下:
+/common/models/model.json
+```javascript
+{
+  "name": "Example",
+  "base": "MyBaseModel",
+}
+```
+当你扩展一个模型的时候你可以添加新的元素：
+/common/models/model.json
+```javascript
+{
+   "name": "Customer",
+   "base": "User",
+   "properties": {
+      "favoriteMovie": {
+        "type": "string"
+      }
+   }
+}
+```
+定义其他模型设置
+--------------
+这里有一些很重要的属性你可以去定义
+*   plural 设置一个String类型的值用来代替标准的复数形式
+*   strict 设置成true使得一个模型接受预先设置好的属性,默认为false
+*   idInjection 是否自动为一个模型添加id属性，默认为false
+*   http.path customized HTTP path of REST endpoints
+
+用js代码定义一个模型
+---------------------
+定义模型最经典的方法是以编程方式编辑 common/models/ directory的js文件，例如，一个customer模型会有/common/models/customer.js 文件（如果你是使用 slc loopback:model创建模型的话），
+脚本会在模型定义完成后立刻执行，把脚本作为模型定义的一部分，用它来做模型的配置及登记，你也可以添加模型关系，复杂的验证，默认的函数，或者已经确定的属性，基本上是你在JSON中不能做的事。
+注意，在这一点上脚本没有访问app实例。
 
 
 
+改变内置模型的实现
+----------------
+当你将一个模型连接到持久型数据库时，它将变成一个扩展了 PersistedModel的持久型模型，并且LoopBack 会为CRUD 操作添加一些内置操作的设置。在某些情况下，你也可以改变这些实现。使用/server/boot
+可以做到。下面的例子就实现了用Note.find()重写了内置的方法 find()：
+/server/boot/script.js
+```javascript
+module.exports = function(app) {
+  var Note = app.models.Note;
+  var find = Note.find;
+  var cache = {};
 
+  Note.find = function(filter, cb) {
+    var key = '';
+    if(filter) {
+      key = JSON.stringify(filter);
+    }
+    var cachedResults = cache[key];
+    if(cachedResults) {
+      console.log('serving from cache');
+      process.nextTick(function() {
+        cb(null, cachedResults);
+      });
+    } else {
+      console.log('serving from db');
+      find.call(Note, function(err, results) {
+        if(!err) {
+          cache[key] = results;
+        }
+        cb(err, results);
+      });;
+    }
+  }
+}
+```
 
+连接模型到数据库
+===============
+*   概览
+*   添加数据库
+*   添加数据源验证
+*   让模型使用数据库
+
+概览
+-----
+一个数据源能够是一个模型在后台连接并修改数据，就像一个关联的数据库
 
 
 
