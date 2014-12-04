@@ -249,14 +249,56 @@ module.exports = function(app) {
 });
 ```
 
+定制模型
+=======
+一旦你用模型生成器创建模型(slc loopback:model)，你就可以开始定制它了。你可以使用slc来定制、通过编辑Model definition JSON file和添加js代码。
+*   通过slc定制模型
+*   使用JSON定制模型
+    *   扩展另一个模型
+    *   制定另一个模型的设置
+*   通过js代码定制模型
+    *   改变内置方法的实现
 
+通过slc定制模型
+--------------
+一旦你用模型生成器创建模型(slc loopback:model)，你就不能使用模型生成器修改该模型了。
+你可以使用slc定制一个刚创建的模型，具体如下：
+*   使用 slc loopback:property添加模型的属性。查看 Property generator 以了解更多。
+*   使用 slc loopback:relation在模型之间添加关系。查看 Relation generator 以了解更多。
+*   使用 slc loopback:acl添加模型的访问权限，查看 ACL generator 以了解更多。
 
+通过JSON定制模型
+----------------
+你可以定义模型的很多面通过编辑在/common/models中的模型JSON（例如，customer.json），默认值如下：
+/common/models/model.json
+```javascript
+{
+  "name": "myModel",
+  "base": "PersistedModel",
+  "properties": {
+     // Properties listed here depend on your responses to the CLI
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": []
+}
+```
 
-
-
-
-
-
+扩展其他模型
+-----------
+你可以做一个模型扩展或从一个现有的模型继承，可以使像User这样内置的模型，或者你在应用程序中定义的模型。
+编辑模型的JSON文件，并且设置你想要扩展的模型的名字的基本属性，内置的模型或者用户在应用程序中定义的模型。
+例如：下面是 loopback-example-app中的一个片段，通过继承内置的User模型来定义Customer模型
+common/models/model.json
+```javascript
+{
+  "name": "Customer",
+  "base": "User",
+  "idInjection": false,
+...
+```
+总的来说，你可以用这种方法扩展任意模型，不仅仅是内置的模型。
 
 
 
