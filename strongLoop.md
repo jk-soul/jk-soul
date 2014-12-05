@@ -381,13 +381,130 @@ module.exports = function(app) {
 
 概览
 -----
-一个数据源能够是一个模型在后台连接并修改数据，就像一个关联的数据库
+一个数据源能够是一个模型在后台连接并修改数据，就像一个关联的数据库。数据源封装了用于在模型与像关系型数据库这样各种后台系统之间的进行数据交互的代码，这样的后台系统还有REST APIs,SOAP web services, storage services
+等等，数据源一般提供创建，检索，更新，和删除（CRUD）这几类函数。
+模型通过可拓展可定制的连接器访问数据源。一般而言，应用程序代码是不会直接使用连接器的。相反，数据源的类通过了一个API来配置下层的连接器。
+默认的，slc创建一个易于研发的 memory connector,使用一个不同的数据源：
+1.  使用 slc loopaback:datasource创建一个新的数据源，并将其添加到应用程序的datasources.json中去。
+2.  编辑 datasources.json，为数据源添加一个证书。
+3.  创建一个模型连接到数据源，或者修改一个存在的模型定义来使用连接器。
 
+添加一个数据源
+=============
+使用数据源生成器添加一个新的数据源：
+shell
+$ slc loopback:datasource
+它会提示你新数据源的名字，以及使用哪个连接器。例如：MySQL, Oracle, REST等等。该工具将添加一个条目，如下面的datasources.json：
+/server/datasources.json
+```json
+...
+  "corp1": {
+    "name": "corp1",
+    "connector": "mysql"
+  }
+...
+```
+这个例子创建了一个叫corp1的数据源，标示符确定的名称指向的是数据源，也可以使任意字符串。
 
+添加数据源凭证
+-------------
+编辑 datasources.json 为数据源添加必要的验证。典型的 主机名、用户名、密码和数据源名称。例：
+/server/datasources.json
+```json
+"corp1": {
+    "name": "corp1",
+    "connector": "mysql",
+    "host": "your-mysql-server.foo.com",
+    "user": "db-username",
+    "password": "db-password",
+    "database": "your-db-name"
+  }
+```
+让模型使用数据源
+--------------
+编辑应用程序中的模型定义的JSON文件，来设置被模型使用的数据源：例如，使用之前叫mysql的例，如果你按之前 Creating an application 中创建了例子books的数据源，编辑他的dataSource属性为corp1
+来使用相应的MySQL 数据库：
+/common/models/model.json
+```json
+"book": {
+   "properties": {
+     ...
+   },
+   "public": true,
+   "dataSource": "corp1",
+   "plural": "books"
+ }
+```
+在REST上暴露模型
+=================
+*   概览
+    *   REST路径
+    *   使用REST路由。
+    *   请求格式
+        *   使用HTTP查询字符串传递JSON格式的object或数组
+    *   相应格式
+    *   禁用API浏览器
+    *   预定义远程方法
+*   暴露模型
+    *   隐藏方法以及其他端点
+    *   为相关模型隐藏端点
 
+概览
+-----
+LoopBack 会自动有一套标准的HTTP端点,其可以提供 REST APIs在模型上创建，读取，更新和删除操作。在model-config.json中的公共属性可以指定是否暴露模型的REST APIs。
+/server/model-config.json
+```json
+...
+  "MyModel": {
+    "public": true,
+    "dataSource": "db"
+  },
+...
+```
+REST路径
+--------
+默认的，REST的API会安装到模型的复数形式下，具体的：
+*   Model.settings.http.path
+*   Model.settings.plural，如果定义在 models.json中，查看 Project layout reference以了解更多。
+*   自动化多元模型名称
 
+使用REST路由
+------------
+默认情况下，脚手架应用程序暴露在使用 loopback.rest路由的REST上
+/server/server.js
+```javascript
+var app = loopback();
+app.use(loopback.rest());
 
+// Expose the `Product` model
+app.model(Product);
+```
+之后，模型Product 将会有 create, read, update, and delete (CRUD) functions 能够从移动端远程。
 
+请求格式
+--------
+对于For POST and PUT 请求，请求体可以使JSON、XML 和urlencoded 格式
+POST /api/Notes HTTP/1.1
+Host: localhost:3000
+Connection: keep-alive
+Content-Length: 61
+Accept: application/json
+Content-Type: application/json
+
+{
+  "title": "MyNote",
+  "content": "This is my first note"
+}
+
+用HTTP请求传递JSON对象或数组
+有些REST的API接收请求中的JSON对象或者数组，LoopBack 支持两种编码格式的object/array值作为查询参数。
+*   node-querystring (qs)的语法
+*   字符串化的JSON
+例：
+http://localhost:3000/api/users?filter[where][username]=john&filter[where][email]=callback@strongloop.com
+http://localhost:3000/api/users?filter={"where":{"username":"john","email":"callback@strongloop.com"}}
+
+下面的表格显示了如何编译在不同形式下编译的JSON object/array。
 
 
 
