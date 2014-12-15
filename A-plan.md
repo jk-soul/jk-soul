@@ -1,0 +1,11 @@
+* 学习《node.js开发指南》
+  * 模块加载机制
+  * npm命令
+  * 常用库
+  * Express练习
+* 数据库(mongo,mysql)
+  * mongo：基本操作语法、mongoose
+  * mysql：sql查询、和mysql相关的一个ORM
+* 团队协作工具git
+* 了解bootstrap3
+* 熟练ng的概念及ng常用的库（AngularUI）
