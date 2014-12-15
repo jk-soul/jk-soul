@@ -506,7 +506,118 @@ http://localhost:3000/api/users?filter={"where":{"username":"john","email":"call
 
 下面的表格显示了如何编译在不同形式下编译的JSON object/array。
 
+验证模型的数据
+=============
 
+
+创建模型关系
+===========
+模型关系概览
+-----------
+单个模型易于理解和使用。但在现实中，模型之间通常连接或与相关联的。当你建立一个多模型的实际应用，你通常会需要定义模型之间的关系。例如：
+*   一个客户有多个订单，而一个订单会有属于一个客户。
+*   等等
+
+
+
+你可以再模型之间定义如下关系：
+*   BelongsTo relations
+*   HasMany relations
+*   HasManyThrough relations
+*   HasAndBelongsToMany relations
+*   Polymorphic relations
+*   Embedded relations (embedsOne and embedsMany)
+
+你可以再模型的JSON文件中定义模型关系或者在js代码中，结果都是一样的。当你创建一个模型的关系时，LoopBack 会为模型添加一组方法作为该类关系的
+详细描述。
+
+Relation options
+大部分关系类型都有这三个选项：
+*   Scope
+*   Properties
+*   Custom scope methods
+
+Scope
+Scope属性可以使对象也可以使函数，适用于所有的过滤/条件对相关Scope
+该对象，或者返回的对象（函数被调用时）有所有的一般过滤选项：where, order, include, limit, offset, ..
+These options are merged into the default filter, which means that the where part will be AND-ed. The other options usually override the defaults (standard mergeQuery behavior).
+当scope是个函数时，他接收一个当前实例以及默认的筛选对象。
+```javascript
+
+// only allow products of type: 'shoe', always include products
+Category.hasMany(Product,
+                 { as: 'shoes',
+                   scope: { where: { type: 'shoe' },
+                   include: 'products'
+});
+Product.hasMany(Image,
+                { scope: function(inst, filter) {
+                           return { type: inst.type };
+                         }
+});  // inst is a category - match category type with product type.
+```
+
+Properties
+-------------
+你可以有两种方法指定properties 属性：
+*   作为一个object:
+*   作为一个function:
+
+```javascript
+Category.hasMany(Product,
+                 { as: 'shoes',
+                 properties: { type: 'type', category: 'categoryName' });
+```
+```javascript
+Product.hasMany(Image,
+                { properties: function(inst) { // inst is a category
+                                return { type: inst.type, categoryName: inst.name };
+                              }
+});
+```
+
+Custom scope methods
+-----------------------
+最后，你可以使用scopeMethods 属性来自定义，同样，选项可以使object 或者 function 。
+```javascript
+var reorderFn = function(ids, cb) {
+  // `this` refers to the RelationDefinition
+  console.log(this.name); // `images` (relation name)
+  // do some reordering here & save
+  cb(null, [3, 2, 1]);
+};
+
+// manually declare remoting params
+reorderFn.shared = true;
+reorderFn.accepts = { arg: 'ids', type: 'array', http: { source: 'body' } };
+reorderFn.returns = { arg: 'ids', type: 'array', root: true };
+reorderFn.http = { verb: 'put', path: '/images/reorder' };
+
+Product.hasMany(Image, { scopeMethods: { reorder: reorderFn } });
+```
+Exposing REST APIs for related models
+---------------------------------------
+```javascript
+var db = loopback.createDataSource({connector: 'memory'});
+  Customer = db.createModel('customer', {
+    name: String,
+    age: Number
+  });
+  Review = db.createModel('review', {
+    product: String,
+    star: Number
+  });
+  Order = db.createModel('order', {
+    description: String,
+    total: Number
+  });
+
+  Customer.scope("youngFolks", {where: {age: {lte: 22}}});
+  Review.belongsTo(Customer, {foreignKey: 'authorId', as: 'author'});
+  Customer.hasMany(Review, {foreignKey: 'authorId', as: 'reviews'});
+  Customer.hasMany(Order, {foreignKey: 'customerId', as: 'orders'});
+  Order.belongsTo(Customer, {foreignKey: 'customerId'});
+```
 
 
 
