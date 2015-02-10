@@ -127,7 +127,7 @@ function (err, models) {
 })
 ```
 
-其他发现功能
+其他发现功能1
 ---------
 /server/bin/script.js
 ```javascript
